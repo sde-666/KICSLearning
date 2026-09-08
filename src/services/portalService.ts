@@ -682,17 +682,6 @@ export async function fetchStudents(): Promise<Student[]> {
     console.warn('Firestore fetchStudents notice:', e);
   }
 
-  // Purge obsolete demo test student if present
-  if (localStudents['KICS-101']) {
-    delete localStudents['KICS-101'];
-    setStoredList(STORAGE_KEYS.STUDENTS, localStudents);
-    try {
-      deleteDoc(doc(db, 'students', 'KICS-101')).catch(() => {});
-    } catch {
-      // ignore
-    }
-  }
-
   return Object.values(localStudents)
     .map((s) => ({ ...s, course_ids: normalizeStudentCourseIds(s) }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -894,9 +883,9 @@ export async function loginStudent(
       last_login_device: device,
     });
   } catch (e) {
-    // If updateDoc failed because doc didn't exist yet in firestore, create it
+    // If updateDoc failed because doc didn't exist yet in firestore, create or merge it
     try {
-      await setDoc(doc(db, 'students', cleanId), student);
+      await setDoc(doc(db, 'students', cleanId), student, { merge: true });
     } catch (err) {
       console.warn('Failed to sync session token to cloud:', err);
     }
@@ -939,7 +928,8 @@ export function listenToStudentSession(
   studentId: string,
   sessionToken: string,
   onTerminated: (reason: string) => void,
-  onStudentUpdated?: (student: Student) => void
+  onStudentUpdated?: (student: Student) => void,
+  sessionLoginTime?: string
 ): () => void {
   const cleanId = studentId.trim().toUpperCase();
 
@@ -947,10 +937,34 @@ export function listenToStudentSession(
     const unsub = onSnapshot(
       doc(db, 'students', cleanId),
       (snap) => {
-        if (!snap.exists()) {
-          onTerminated('Your student account was removed from the institute portal.');
+        // If snapshot has pending local writes, ignore intermediate state
+        if (snap.metadata.hasPendingWrites) {
           return;
         }
+
+        if (!snap.exists()) {
+          // Check local cache to avoid false logouts during initial offline / network sync
+          const localStudents = getStoredList<Record<string, Student>>(STORAGE_KEYS.STUDENTS, {});
+          if (localStudents[cleanId]) {
+            // Document exists locally; heal back to Firestore with current session
+            setDoc(
+              doc(db, 'students', cleanId),
+              {
+                ...localStudents[cleanId],
+                active_session_token: sessionToken,
+              },
+              { merge: true }
+            ).catch(() => {});
+            return;
+          }
+
+          // Only terminate if confirmed missing from server and not a temporary local cache miss
+          if (!(snap as any).metadata?.fromCache) {
+            onTerminated('Your student account was removed from the institute portal.');
+          }
+          return;
+        }
+
         const raw = snap.data() as Student;
         const data: Student = {
           ...raw,
@@ -961,11 +975,26 @@ export function listenToStudentSession(
           onTerminated('Your student account has been deactivated by the faculty.');
           return;
         }
+
+        // Single device check:
+        // Only terminate if another active token was issued and its login timestamp is newer than our session
         if (data.active_session_token && data.active_session_token !== sessionToken) {
-          onTerminated(
-            'You have been logged out because your account was logged into on another device or browser. Only one active login is allowed at a time.'
-          );
-          return;
+          let isAnotherDeviceNewerLogin = true;
+          if (data.last_login_at && sessionLoginTime) {
+            const cloudLoginTime = new Date(data.last_login_at).getTime();
+            const currentLoginTime = new Date(sessionLoginTime).getTime();
+            // If cloud token has a timestamp older than or equal to current login, it's stale data
+            if (cloudLoginTime <= currentLoginTime) {
+              isAnotherDeviceNewerLogin = false;
+            }
+          }
+
+          if (isAnotherDeviceNewerLogin) {
+            onTerminated(
+              'You have been logged out because your account was logged into on another device or browser. Only one active login is allowed at a time.'
+            );
+            return;
+          }
         }
 
         // Notify of real-time course access or profile updates

@@ -84,17 +84,12 @@ export default function App() {
     return () => unsub();
   }, []);
 
-  // Student Session & Single-Device Enforcement State
+  // Student Session & Persistent Storage State
   const [studentSession, setStudentSession] = useState<StudentSession | null>(() => {
     try {
       const raw = localStorage.getItem('kics_student_session');
       if (raw) {
-        const parsed = JSON.parse(raw) as StudentSession;
-        if (parsed.studentId === 'KICS-101') {
-          localStorage.removeItem('kics_student_session');
-          return null;
-        }
-        return parsed;
+        return JSON.parse(raw) as StudentSession;
       }
       return null;
     } catch {
@@ -138,11 +133,12 @@ export default function App() {
           localStorage.setItem('kics_student_session', JSON.stringify(updatedSession));
           return updatedSession;
         });
-      }
+      },
+      studentSession.loginTime
     );
 
     return () => unsub();
-  }, [studentSession?.studentId, studentSession?.sessionToken]);
+  }, [studentSession?.studentId, studentSession?.sessionToken, studentSession?.loginTime]);
 
   // Handle successful student login
   const handleStudentLoginSuccess = (student: Student, sessionToken: string) => {
