@@ -77,7 +77,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
           .map((c) => c.title)
           .join(', ') || 'No courses assigned';
 
-    const text = `KICS Institute Student Login:\nStudent ID / Roll No: ${s.id}\nPassword: ${s.password}\nAllowed Courses: ${assignedCoursesList}\nPortal: ${typeof window !== 'undefined' ? window.location.origin : ''}`;
+    const text = `KICS Institute Student Login:\nStudent ID / Roll No: ${s.id}\nPassword: ${s.password}\nAllowed Courses: ${assignedCoursesList}\nPortal: https://kicslearning.vercel.app/`;
     navigator.clipboard.writeText(text);
     setCopiedId(s.id);
     notify(`Credentials for "${s.name}" copied to clipboard!`);
@@ -628,346 +628,357 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
 
       {/* Modal: Enroll / Edit Student */}
       {isModalOpen && editingStudent && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
-            {/* Modal Header */}
-            <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-300">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-xl max-h-[88vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150 my-auto">
+            {/* Modal Header (Fixed at top) */}
+            <div className="bg-slate-900 text-white px-5 py-3.5 shrink-0 flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-300 shrink-0">
                   <GraduationCap className="w-4 h-4" />
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold tracking-tight">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold tracking-tight truncate">
                     {students.some((s) => s.id === editingStudent.id)
                       ? `Edit Student: ${editingStudent.name || editingStudent.id}`
                       : 'Enroll New Institute Student'}
                   </h3>
-                  <p className="text-[11px] text-slate-400">
-                    Create credentials to provide manually to your student
+                  <p className="text-[11px] text-slate-400 truncate">
+                    Set up credentials and course access for your student
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer shrink-0 ml-2"
+                title="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSaveStudent} className="p-6 space-y-4 text-xs">
-              {modalError && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>{modalError}</span>
-                </div>
-              )}
+            <form onSubmit={handleSaveStudent} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              {/* Scrollable Form Body */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 text-xs">
+                {modalError && (
+                  <div className="p-2.5 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span className="text-xs">{modalError}</span>
+                  </div>
+                )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Student ID / Roll No *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingStudent.id || ''}
-                    onChange={(e) =>
-                      setEditingStudent({ ...editingStudent, id: e.target.value.toUpperCase() })
-                    }
-                    placeholder="e.g. 202401 or Roll No"
-                    required
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-                  />
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">
-                    Must be unique for each student
-                  </span>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Student Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={editingStudent.name || ''}
-                    onChange={(e) => setEditingStudent({ ...editingStudent, name: e.target.value })}
-                    placeholder="e.g. Rahul Sharma"
-                    required
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block font-semibold text-slate-700 uppercase tracking-wider">
-                    Student Login Password *
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setEditingStudent({
-                        ...editingStudent,
-                        password: Math.random().toString(36).substring(2, 8) + '25',
-                      })
-                    }
-                    className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer hover:underline"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Generate Random</span>
-                  </button>
-                </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={editingStudent.password || ''}
-                    onChange={(e) =>
-                      setEditingStudent({ ...editingStudent, password: e.target.value })
-                    }
-                    placeholder="Set student password"
-                    required
-                    className="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-                  />
-                  <Key className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2" />
-                </div>
-                <p className="text-[10px] text-slate-500 mt-1">
-                  Give this password to the student. They will use this along with their Student ID to sign in.
-                </p>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Phone / WhatsApp (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={editingStudent.phone || ''}
-                  onChange={(e) =>
-                    setEditingStudent({ ...editingStudent, phone: e.target.value })
-                  }
-                  placeholder="e.g. +91 9876543210"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-                />
-              </div>
-
-              {/* Course Access Permissions */}
-              <div className="bg-slate-50/80 p-4 rounded-xl border border-slate-200">
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Course Access Permissions *</span>
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setEditingStudent({
-                          ...editingStudent,
-                          course_ids: ['all'],
-                          course_id: 'all',
-                        })
+                {/* Row 1: Student ID & Full Name */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">
+                      Student ID / Roll No *
+                    </label>
+                    <input
+                      type="text"
+                      value={editingStudent.id || ''}
+                      onChange={(e) =>
+                        setEditingStudent({ ...editingStudent, id: e.target.value.toUpperCase() })
                       }
-                      className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold hover:underline cursor-pointer"
-                    >
-                      Select All
-                    </button>
-                    <span className="text-slate-300">|</span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setEditingStudent({
-                          ...editingStudent,
-                          course_ids: [],
-                          course_id: '',
-                        })
-                      }
-                      className="text-[11px] text-slate-500 hover:text-slate-700 font-medium hover:underline cursor-pointer"
-                    >
-                      Clear All
-                    </button>
+                      placeholder="e.g. 202401 or Roll No"
+                      required
+                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 text-xs"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">
+                      Must be unique for each student
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">
+                      Student Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={editingStudent.name || ''}
+                      onChange={(e) => setEditingStudent({ ...editingStudent, name: e.target.value })}
+                      placeholder="e.g. Rahul Sharma"
+                      required
+                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 text-xs"
+                    />
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500 mb-3">
-                  Control which courses this student can see and open. Any course not selected here will be completely hidden from this student.
-                </p>
-
-                {/* Full Access Toggle Card */}
-                {(() => {
-                  const isFull =
-                    editingStudent.course_ids?.includes('all') ||
-                    editingStudent.course_id === 'all';
-
-                  return (
-                    <div
-                      onClick={() => {
-                        if (isFull) {
-                          // Switch to custom selection with current courses
+                {/* Row 2: Password & Phone */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block font-semibold text-slate-700 uppercase tracking-wider text-[11px]">
+                        Login Password *
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
                           setEditingStudent({
                             ...editingStudent,
-                            course_ids: courses.map((c) => String(c.id)),
-                            course_id: String(courses[0]?.id || '1'),
-                          });
-                        } else {
+                            password: Math.random().toString(36).substring(2, 8) + '25',
+                          })
+                        }
+                        className="text-[10px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer hover:underline"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>Generate</span>
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={editingStudent.password || ''}
+                        onChange={(e) =>
+                          setEditingStudent({ ...editingStudent, password: e.target.value })
+                        }
+                        placeholder="Set password"
+                        required
+                        className="w-full pl-3 pr-8 py-1.5 bg-slate-50 border border-slate-300 rounded-lg font-mono text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 text-xs"
+                      />
+                      <Key className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">
+                      Phone / WhatsApp (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={editingStudent.phone || ''}
+                      onChange={(e) =>
+                        setEditingStudent({ ...editingStudent, phone: e.target.value })
+                      }
+                      placeholder="e.g. +91 9876543210"
+                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 text-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Course Access Permissions */}
+                <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Course Access Permissions *</span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
                           setEditingStudent({
                             ...editingStudent,
                             course_ids: ['all'],
                             course_id: 'all',
-                          });
+                          })
                         }
-                      }}
-                      className={`p-3 rounded-lg border transition-all cursor-pointer mb-2.5 flex items-center justify-between ${
-                        isFull
-                          ? 'bg-blue-50 border-blue-400 text-blue-900 shadow-xs ring-1 ring-blue-400/20'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <input
-                          type="checkbox"
-                          checked={isFull}
-                          onChange={() => {}}
-                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 pointer-events-none"
-                        />
-                        <div>
-                          <div className="font-bold text-xs flex items-center gap-1.5">
-                            <span>Full Curriculum Access (All Modules)</span>
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-200 text-blue-800">
-                              {courses.length} Courses
-                            </span>
-                          </div>
-                          <div className="text-[10px] text-slate-500 mt-0.5">
-                            Grant unrestricted access to all NIELIT O-Level modules and future courses.
-                          </div>
-                        </div>
-                      </div>
-                      <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 ml-2" />
+                        className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold hover:underline cursor-pointer"
+                      >
+                        Select All
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditingStudent({
+                            ...editingStudent,
+                            course_ids: [],
+                            course_id: '',
+                          })
+                        }
+                        className="text-[11px] text-slate-500 hover:text-slate-700 font-medium hover:underline cursor-pointer"
+                      >
+                        Clear All
+                      </button>
                     </div>
-                  );
-                })()}
+                  </div>
 
-                {/* Specific Course Checkboxes */}
-                <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
-                  {courses.map((c) => {
+                  <p className="text-[10px] text-slate-500 mb-2">
+                    Courses not selected here will be completely hidden from this student.
+                  </p>
+
+                  {/* Full Access Toggle Card */}
+                  {(() => {
                     const isFull =
                       editingStudent.course_ids?.includes('all') ||
                       editingStudent.course_id === 'all';
-                    const isChecked =
-                      isFull || editingStudent.course_ids?.includes(String(c.id));
 
                     return (
-                      <label
-                        key={c.id}
-                        className={`flex items-start gap-2.5 p-2.5 rounded-lg border transition-all cursor-pointer ${
-                          isChecked
-                            ? 'bg-blue-50/70 border-blue-300 text-blue-950'
-                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100/60'
+                      <div
+                        onClick={() => {
+                          if (isFull) {
+                            setEditingStudent({
+                              ...editingStudent,
+                              course_ids: courses.map((c) => String(c.id)),
+                              course_id: String(courses[0]?.id || '1'),
+                            });
+                          } else {
+                            setEditingStudent({
+                              ...editingStudent,
+                              course_ids: ['all'],
+                              course_id: 'all',
+                            });
+                          }
+                        }}
+                        className={`p-2.5 rounded-lg border transition-all cursor-pointer mb-2 flex items-center justify-between ${
+                          isFull
+                            ? 'bg-blue-50 border-blue-400 text-blue-900 shadow-2xs ring-1 ring-blue-400/20'
+                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
                         }`}
                       >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          disabled={isFull}
-                          onChange={() => toggleCourseInModal(String(c.id))}
-                          className="w-4 h-4 mt-0.5 rounded text-blue-600 focus:ring-blue-500 disabled:opacity-60 cursor-pointer"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className={`text-xs ${isChecked ? 'font-bold text-blue-900' : 'font-medium text-slate-800'} truncate`}>
-                              {c.title}
-                            </span>
-                            <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                              Module #{c.id}
-                            </span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isFull}
+                            onChange={() => {}}
+                            className="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500 pointer-events-none"
+                          />
+                          <div>
+                            <div className="font-bold text-xs flex items-center gap-1.5">
+                              <span>Full Curriculum Access (All Modules)</span>
+                              <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-200 text-blue-800">
+                                {courses.length} Courses
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-500">
+                              Grant unrestricted access to all NIELIT O-Level modules and future courses.
+                            </div>
                           </div>
-                          {c.description && (
-                            <p className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">
-                              {c.description}
-                            </p>
-                          )}
                         </div>
-                      </label>
+                        <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 ml-2" />
+                      </div>
                     );
-                  })}
-                </div>
+                  })()}
 
-                {/* Selection Counter & Alerts */}
-                <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-600">
-                    Assigned Courses:{' '}
-                    <strong className="text-blue-700 font-bold">
-                      {editingStudent.course_ids?.includes('all') ||
-                      editingStudent.course_id === 'all'
-                        ? `All ${courses.length} Modules`
-                        : `${editingStudent.course_ids?.length || 0} of ${courses.length} Modules Selected`}
-                    </strong>
-                  </span>
+                  {/* Specific Course Checkboxes */}
+                  <div className="space-y-1 max-h-36 overflow-y-auto pr-1">
+                    {courses.map((c) => {
+                      const isFull =
+                        editingStudent.course_ids?.includes('all') ||
+                        editingStudent.course_id === 'all';
+                      const isChecked =
+                        isFull || editingStudent.course_ids?.includes(String(c.id));
 
-                  {(!editingStudent.course_ids || editingStudent.course_ids.length === 0) &&
-                    editingStudent.course_id !== 'all' && (
-                      <span className="text-red-600 font-semibold flex items-center gap-1">
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        <span>No courses selected! Student will see no content.</span>
-                      </span>
-                    )}
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <label className="flex items-center gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={editingStudent.is_active ?? true}
-                    onChange={(e) =>
-                      setEditingStudent({ ...editingStudent, is_active: e.target.checked })
-                    }
-                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
-                  />
-                  <div>
-                    <span className="font-semibold text-slate-800">Account Active</span>
-                    <p className="text-[11px] text-slate-500">
-                      Uncheck to immediately suspend student access to the portal.
-                    </p>
+                      return (
+                        <label
+                          key={c.id}
+                          className={`flex items-start gap-2 p-2 rounded-md border transition-all cursor-pointer ${
+                            isChecked
+                              ? 'bg-blue-50/70 border-blue-300 text-blue-950'
+                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100/60'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            disabled={isFull}
+                            onChange={() => toggleCourseInModal(String(c.id))}
+                            className="w-3.5 h-3.5 mt-0.5 rounded text-blue-600 focus:ring-blue-500 disabled:opacity-60 cursor-pointer"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className={`text-xs ${isChecked ? 'font-bold text-blue-900' : 'font-medium text-slate-800'} truncate`}>
+                                {c.title}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                                #{c.id}
+                              </span>
+                            </div>
+                            {c.description && (
+                              <p className="text-[10px] text-slate-500 line-clamp-1 mt-0.5">
+                                {c.description}
+                              </p>
+                            )}
+                          </div>
+                        </label>
+                      );
+                    })}
                   </div>
-                </label>
+
+                  {/* Selection Counter & Alerts */}
+                  <div className="mt-2 pt-1.5 border-t border-slate-200/80 flex items-center justify-between text-[10px]">
+                    <span className="text-slate-600">
+                      Assigned:{' '}
+                      <strong className="text-blue-700 font-bold">
+                        {editingStudent.course_ids?.includes('all') ||
+                        editingStudent.course_id === 'all'
+                          ? `All ${courses.length} Modules`
+                          : `${editingStudent.course_ids?.length || 0} of ${courses.length} Modules Selected`}
+                      </strong>
+                    </span>
+
+                    {(!editingStudent.course_ids || editingStudent.course_ids.length === 0) &&
+                      editingStudent.course_id !== 'all' && (
+                        <span className="text-red-600 font-semibold flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          <span>No courses selected!</span>
+                        </span>
+                      )}
+                  </div>
+                </div>
+
+                {/* Account Active & Single Session Info */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  <label className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editingStudent.is_active ?? true}
+                      onChange={(e) =>
+                        setEditingStudent({ ...editingStudent, is_active: e.target.checked })
+                      }
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+                    />
+                    <div>
+                      <span className="font-semibold text-slate-800 block text-xs">Account Active</span>
+                      <p className="text-[10px] text-slate-500">
+                        Uncheck to immediately suspend access
+                      </p>
+                    </div>
+                  </label>
+
+                  <div className="p-2.5 bg-blue-50/80 rounded-lg border border-blue-200 text-blue-900 flex items-start gap-2">
+                    <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <span className="text-[10px] leading-tight">
+                      <strong>Single Active Device:</strong> Logging in on another device automatically disconnects any previous session.
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              {/* Security Reminder */}
-              <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 text-blue-800 flex items-start gap-2">
-                <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                <span className="text-[11px] leading-relaxed">
-                  <strong>Single Session Active:</strong> The student can only log into one browser or device at a time. If they share their password, the other person will be instantly disconnected.
-                </span>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-slate-600 hover:text-slate-800 font-semibold rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={modalSaving}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                >
-                  {modalSaving ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>Saving Student...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-3.5 h-3.5" />
-                      <span>Save Student Credentials</span>
-                    </>
-                  )}
-                </button>
+              {/* Modal Footer (Sticky / Always visible at bottom - Never requires zooming out) */}
+              <div className="shrink-0 bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between gap-3">
+                <p className="text-[11px] text-slate-500 hidden sm:block">
+                  {students.some((s) => s.id === editingStudent.id)
+                    ? 'Updating existing student profile'
+                    : 'Credentials can be copied after saving'}
+                </p>
+                <div className="flex items-center gap-2.5 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 text-slate-600 hover:text-slate-800 font-semibold rounded-lg hover:bg-slate-200/70 transition-colors cursor-pointer text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={modalSaving}
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50 text-xs"
+                  >
+                    {modalSaving ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving Student...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-3.5 h-3.5" />
+                        <span>Save Student Credentials</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
