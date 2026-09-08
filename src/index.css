@@ -1,0 +1,369 @@
+@import "tailwindcss";
+
+/* Preserve note HTML styling from original CKEditor templates & Rich Editor Canvas */
+.note-rendered-html,
+.editor-canvas {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #2c3e50;
+  word-break: break-word;
+}
+
+.editor-canvas:empty::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+  display: block;
+  font-style: italic;
+}
+
+.note-rendered-html p,
+.editor-canvas p {
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.75;
+}
+
+.note-rendered-html h1,
+.editor-canvas h1,
+.note-rendered-html h2,
+.editor-canvas h2,
+.note-rendered-html h3,
+.editor-canvas h3,
+.note-rendered-html h4,
+.editor-canvas h4 {
+  line-height: 1.3;
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+  color: #0f172a;
+  font-weight: 700;
+  display: block;
+}
+
+.note-rendered-html h1,
+.editor-canvas h1 { font-size: 1.75rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+
+.note-rendered-html h2,
+.editor-canvas h2 { font-size: 1.4rem; font-weight: 700; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+
+.note-rendered-html h3,
+.editor-canvas h3 { font-size: 1.2rem; font-weight: 700; }
+
+.note-rendered-html h4,
+.editor-canvas h4 { font-size: 1.1rem; font-weight: 600; color: #475569; }
+
+.note-rendered-html ul,
+.editor-canvas ul {
+  padding-left: 1.75rem !important;
+  margin-top: 0.75rem;
+  margin-bottom: 1.25rem;
+  list-style-type: disc !important;
+  display: block;
+}
+
+.note-rendered-html ol,
+.editor-canvas ol {
+  padding-left: 1.75rem !important;
+  margin-top: 0.75rem;
+  margin-bottom: 1.25rem;
+  list-style-type: decimal !important;
+  display: block;
+}
+
+.note-rendered-html li,
+.editor-canvas li {
+  margin-bottom: 0.5rem;
+  display: list-item !important;
+}
+
+.note-rendered-html strong,
+.editor-canvas strong,
+.note-rendered-html b,
+.editor-canvas b {
+  font-weight: 700 !important;
+}
+
+.note-rendered-html em,
+.editor-canvas em,
+.note-rendered-html i,
+.editor-canvas i {
+  font-style: italic !important;
+}
+
+.note-rendered-html u,
+.editor-canvas u {
+  text-decoration: underline !important;
+}
+
+.note-rendered-html s,
+.editor-canvas s,
+.note-rendered-html strike,
+.editor-canvas strike,
+.note-rendered-html del,
+.editor-canvas del {
+  text-decoration: line-through !important;
+}
+
+.note-rendered-html sub,
+.editor-canvas sub {
+  vertical-align: sub !important;
+  font-size: 0.75em !important;
+}
+
+.note-rendered-html sup,
+.editor-canvas sup {
+  vertical-align: super !important;
+  font-size: 0.75em !important;
+}
+
+.note-rendered-html blockquote,
+.editor-canvas blockquote {
+  border-left: 4px solid #5f90eb !important;
+  background: #f8fafc !important;
+  padding: 12px 18px !important;
+  margin: 1.25rem 0 !important;
+  font-style: italic !important;
+  color: #334155 !important;
+  border-radius: 0 8px 8px 0 !important;
+}
+
+.note-rendered-html pre,
+.editor-canvas pre,
+.note-rendered-html code,
+.editor-canvas code {
+  background: #f1f5f9;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.note-rendered-html pre,
+.editor-canvas pre {
+  padding: 15px;
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+  border: 1px solid #e2e8f0;
+  background: #0f172a;
+  color: #f8fafc;
+  border-radius: 10px;
+}
+
+.note-rendered-html pre code,
+.editor-canvas pre code {
+  background: transparent;
+  color: #f8fafc;
+  padding: 0;
+  border: none;
+}
+
+.note-rendered-html code,
+.editor-canvas code {
+  padding: 2px 6px;
+  font-size: 0.9em;
+  color: #db2777;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.note-rendered-html a,
+.editor-canvas a {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.note-rendered-html a:hover,
+.editor-canvas a:hover {
+  color: #1d4ed8;
+}
+
+/* Editor and Note Table Styles */
+.note-rendered-html table,
+.editor-canvas table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  background-color: #ffffff;
+}
+
+.note-rendered-html th,
+.editor-canvas th {
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  padding: 0.625rem 0.875rem;
+  font-weight: 700;
+  text-align: left;
+  color: #0f172a;
+}
+
+.note-rendered-html td,
+.editor-canvas td {
+  border: 1px solid #cbd5e1;
+  padding: 0.625rem 0.875rem;
+  color: #334155;
+}
+
+.note-rendered-html hr,
+.editor-canvas hr {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}
+
+/* Note Images - Mobile and Desktop Optimized */
+.note-rendered-html img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 0.875rem;
+  margin: 1.25rem auto;
+  display: block;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: zoom-in;
+}
+
+@media (max-width: 640px) {
+  .note-rendered-html img {
+    margin: 0.875rem auto;
+    border-radius: 0.625rem;
+  }
+}
+
+/* Note Tables - Responsive and Mobile-Friendly */
+.note-rendered-html .table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border-radius: 0.875rem;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.note-rendered-html table {
+  width: 100%;
+  min-width: 540px; /* Ensures columns never crunch on mobile */
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.925rem;
+  display: table !important; /* Preserves genuine table layout */
+}
+
+@media (max-width: 640px) {
+  .note-rendered-html table {
+    min-width: 480px;
+    font-size: 0.85rem;
+  }
+}
+
+.note-rendered-html table td,
+.note-rendered-html table th {
+  border: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  vertical-align: top;
+}
+
+.note-rendered-html table th {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.note-rendered-html table tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+/* Total Privacy & Content Protection */
+.note-content-protected,
+.note-content-protected *,
+.note-rendered-html,
+.note-rendered-html * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  -webkit-touch-callout: none !important; /* Crucial for iOS & Android: prevents tap & hold copy menu */
+}
+
+/* Theme: Sepia Reading Mode */
+.theme-sepia .note-rendered-html {
+  color: #2e261f;
+}
+.theme-sepia .note-rendered-html .table-responsive-wrapper {
+  border-color: #dcd0bf;
+  background-color: #faf6f0;
+}
+.theme-sepia .note-rendered-html img {
+  border-color: #dcd0bf;
+  background-color: #faf6f0;
+}
+.theme-sepia .note-rendered-html table td,
+.theme-sepia .note-rendered-html table th {
+  border-color: #dcd0bf;
+}
+.theme-sepia .note-rendered-html table th {
+  background-color: #ede2d1;
+  color: #1a140e;
+}
+.theme-sepia .note-rendered-html table tr:nth-child(even) td {
+  background-color: #f4ede1;
+}
+
+/* Theme: Dark Reading Mode */
+.theme-dark .note-rendered-html {
+  color: #cbd5e1;
+}
+.theme-dark .note-rendered-html .table-responsive-wrapper {
+  border-color: #334155;
+  background-color: #1e293b;
+}
+.theme-dark .note-rendered-html img {
+  border-color: #334155;
+  background-color: #0f172a;
+}
+.theme-dark .note-rendered-html table td,
+.theme-dark .note-rendered-html table th {
+  border-color: #334155;
+  color: #cbd5e1;
+}
+.theme-dark .note-rendered-html table th {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+.theme-dark .note-rendered-html table tr:nth-child(even) td {
+  background-color: #182234;
+}
+
+/* Font Size Variations */
+.font-size-small .note-rendered-html { font-size: 0.95rem; line-height: 1.65; }
+.font-size-normal .note-rendered-html { font-size: 1.08rem; line-height: 1.75; }
+.font-size-large .note-rendered-html { font-size: 1.2rem; line-height: 1.85; }
+.font-size-xlarge .note-rendered-html { font-size: 1.35rem; line-height: 1.95; }
+
+/* Mobile Touch Scrolling for Note Tables & Code */
+.note-rendered-html pre,
+.note-rendered-html table {
+  -webkit-overflow-scrolling: touch;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  header, nav, .reader-toolbar, .reader-nav-footer, button {
+    display: none !important;
+  }
+  article {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}

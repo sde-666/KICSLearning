@@ -1,0 +1,26 @@
+[
+  {
+    "id": 2,
+    "title": "M1-R5.1-It Tools & Network Basics",
+    "description": "For O level Students",
+    "is_visible": 1
+  },
+  {
+    "id": 5,
+    "title": "M2-R5.1-Web Designing & Publishing (WDP)",
+    "description": "For O level Students",
+    "is_visible": 1
+  },
+  {
+    "id": 6,
+    "title": "M3-R5.1-Python Programming",
+    "description": "For O level Students",
+    "is_visible": 1
+  },
+  {
+    "id": 7,
+    "title": "M4-R5.1-Internet of Thing (IoT)",
+    "description": "For O level Students",
+    "is_visible": 1
+  }
+]

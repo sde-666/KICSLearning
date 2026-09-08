@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "Course": {
+      "title": "Course",
+      "description": "A syllabus course module in the learning portal.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number", "description": "Unique numeric course ID" },
+        "title": { "type": "string", "description": "Course title" },
+        "description": { "type": "string", "description": "Overview of course content" },
+        "is_visible": { "type": "boolean", "description": "Whether visible to public students" }
+      },
+      "required": ["id", "title", "is_visible"]
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "A chapter or unit within a course.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number", "description": "Unique numeric chapter ID" },
+        "course_id": { "type": "number", "description": "Parent course ID" },
+        "title": { "type": "string", "description": "Chapter unit title" },
+        "order": { "type": "number", "description": "Sorting sequence order" },
+        "is_visible": { "type": "boolean", "description": "Whether visible to public students" }
+      },
+      "required": ["id", "course_id", "title", "is_visible"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "A lecture note with rich content, topic number, and optional attachment.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number", "description": "Unique numeric note ID" },
+        "chapter_id": { "type": "number", "description": "Parent chapter ID" },
+        "title": { "type": "string", "description": "Lecture topic title" },
+        "topic_number": { "type": "number", "description": "Topic order number" },
+        "content": { "type": "string", "description": "Rich HTML content from text editor" },
+        "file": { "type": "string", "description": "Optional file path or link" },
+        "publish_date": { "type": "string", "description": "Publish date YYYY-MM-DD" },
+        "is_visible": { "type": "boolean", "description": "Whether visible to public students" }
+      },
+      "required": ["id", "chapter_id", "title", "content", "is_visible"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Institute enrolled student with single-session enforcement.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Student ID or Roll number (e.g. KICS-101)" },
+        "name": { "type": "string", "description": "Full name of the student" },
+        "password": { "type": "string", "description": "Student login password assigned by admin" },
+        "course_id": { "type": "string", "description": "Legacy assigned course ID or 'all'" },
+        "course_ids": { "type": "array", "description": "List of course IDs the student has access to, or ['all']" },
+        "phone": { "type": "string", "description": "Optional contact number" },
+        "is_active": { "type": "boolean", "description": "Whether account is active or suspended" },
+        "active_session_token": { "type": "string", "description": "Current active session token for single device enforcement" },
+        "last_login_at": { "type": "string", "description": "ISO timestamp of last successful login" },
+        "last_login_device": { "type": "string", "description": "Device/Browser info of last login" },
+        "created_at": { "type": "string", "description": "ISO timestamp when admin created account" }
+      },
+      "required": ["id", "name", "password", "is_active"]
+    }
+  },
+  "firestore": {
+    "/courses/{courseId}": {
+      "schema": "Course",
+      "description": "Collection of learning portal courses."
+    },
+    "/chapters/{chapterId}": {
+      "schema": "Chapter",
+      "description": "Collection of course chapters and units."
+    },
+    "/notes/{noteId}": {
+      "schema": "Note",
+      "description": "Collection of lecture notes."
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Collection of institute students."
+    }
+  }
+}

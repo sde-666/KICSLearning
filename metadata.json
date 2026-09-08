@@ -1,0 +1,6 @@
+{
+  "name": "KICS - Learning Portal",
+  "description": "Karamraji Learning Portal - Official student study portal for Karamraji Institute of Computer Science & IT (KICS) featuring courses, lecture notes, syllabus modules, and study materials.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

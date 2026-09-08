@@ -1,0 +1,226 @@
+[
+  {
+    "id": 3,
+    "title": "Introduction to Computer",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 10,
+    "title": "Introduction to Operating System",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 11,
+    "title": "Word Processing (Libre-Office Writer)",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 12,
+    "title": "Spreadsheet (Libre-Office Calc)",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 13,
+    "title": "Presentation (Libre-Office Impress)",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 14,
+    "title": "Introduction to Internet and WWW",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 15,
+    "title": "E-mail, Social Networking and e-Governance Services",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 16,
+    "title": "Digital Financial Tools and Applications",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 17,
+    "title": "Overview of Futureskills and Cyber Security",
+    "course_id": 2,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 18,
+    "title": "Introduction to Web Design",
+    "course_id": 5,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 19,
+    "title": "Editors",
+    "course_id": 5,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 20,
+    "title": "HTML Basics",
+    "course_id": 5,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 21,
+    "title": "CSS",
+    "course_id": 5,
+    "is_visible": 0,
+    "order": 0
+  },
+  {
+    "id": 22,
+    "title": "CSS Framework",
+    "course_id": 5,
+    "is_visible": 0,
+    "order": 0
+  },
+  {
+    "id": 23,
+    "title": "JavaScript and Angular JS",
+    "course_id": 5,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 24,
+    "title": "Photo Editor",
+    "course_id": 5,
+    "is_visible": 0,
+    "order": 0
+  },
+  {
+    "id": 25,
+    "title": "Web Publishing and Browsing",
+    "course_id": 5,
+    "is_visible": 0,
+    "order": 0
+  },
+  {
+    "id": 26,
+    "title": "Introduction to Programming",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 27,
+    "title": "Algorithms and Flowcharts to Solve Problems",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 28,
+    "title": "Introduction to Python",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 29,
+    "title": "Operators, Expressions and Python Statements",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 30,
+    "title": "Sequence Data Types",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 31,
+    "title": "Functions",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 32,
+    "title": "File Processing",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 33,
+    "title": "Scope and Modules",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 34,
+    "title": "NumPy Basics",
+    "course_id": 6,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 35,
+    "title": "Introduction to Internet of Things \u2013 Applications/Devices, Protocols andCommunication Model",
+    "course_id": 7,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 36,
+    "title": "Things and Connections",
+    "course_id": 7,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 37,
+    "title": "Sensors, Actuators and Microcontrollers",
+    "course_id": 7,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 38,
+    "title": "Building IoT applications",
+    "course_id": 7,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 39,
+    "title": "Security and Future of IoT Ecosystem",
+    "course_id": 7,
+    "is_visible": 1,
+    "order": 0
+  },
+  {
+    "id": 40,
+    "title": "Soft skills-Personality Development",
+    "course_id": 7,
+    "is_visible": 1,
+    "order": 0
+  }
+]
