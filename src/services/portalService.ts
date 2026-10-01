@@ -10,7 +10,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { Course, Chapter, Note, Student } from '../types';
+import { Course, Chapter, Note, Student, InstituteSettings, DEFAULT_INSTITUTE_SETTINGS } from '../types';
 import rawCourses from '../data/courses.json';
 import rawChapters from '../data/chapters.json';
 import rawNotes from '../data/notes.json';
@@ -51,6 +51,7 @@ const STORAGE_KEYS = {
   DELETED_CHAPTERS: 'kics_deleted_chapters_v2',
   DELETED_NOTES: 'kics_deleted_notes_v2',
   STUDENTS: 'kics_custom_students_v1',
+  INSTITUTE_SETTINGS: 'kics_institute_settings_v1',
 };
 
 function getStoredList<T>(key: string, defaultVal: T): T {
@@ -1013,4 +1014,121 @@ export function listenToStudentSession(
     return () => {};
   }
 }
+
+/**
+ * Normalizes and merges incoming institute settings with defaults
+ */
+function normalizeInstituteSettings(data?: Partial<InstituteSettings> | null): InstituteSettings {
+  if (!data) return { ...DEFAULT_INSTITUTE_SETTINGS };
+  return {
+    ...DEFAULT_INSTITUTE_SETTINGS,
+    ...data,
+    instituteName: data.instituteName?.trim() || DEFAULT_INSTITUTE_SETTINGS.instituteName,
+    shortName: data.shortName?.trim() || DEFAULT_INSTITUTE_SETTINGS.shortName,
+    tagline: data.tagline?.trim() || DEFAULT_INSTITUTE_SETTINGS.tagline,
+    affiliationText: data.affiliationText?.trim() || DEFAULT_INSTITUTE_SETTINGS.affiliationText,
+    logoUrl: data.logoUrl?.trim() || DEFAULT_INSTITUTE_SETTINGS.logoUrl,
+    portalUrl: data.portalUrl?.trim() || DEFAULT_INSTITUTE_SETTINGS.portalUrl,
+    contactEmail: data.contactEmail?.trim() || DEFAULT_INSTITUTE_SETTINGS.contactEmail,
+    contactPhone: data.contactPhone?.trim() || DEFAULT_INSTITUTE_SETTINGS.contactPhone,
+    address: data.address?.trim() || DEFAULT_INSTITUTE_SETTINGS.address,
+    establishedYear: data.establishedYear?.trim() || DEFAULT_INSTITUTE_SETTINGS.establishedYear,
+    heroBadge: data.heroBadge?.trim() || DEFAULT_INSTITUTE_SETTINGS.heroBadge,
+    heroTitle: data.heroTitle?.trim() || DEFAULT_INSTITUTE_SETTINGS.heroTitle,
+    heroSubtitle: data.heroSubtitle?.trim() || DEFAULT_INSTITUTE_SETTINGS.heroSubtitle,
+    heroNotice: data.heroNotice?.trim() || DEFAULT_INSTITUTE_SETTINGS.heroNotice,
+    updatedAt: data.updatedAt || new Date().toISOString(),
+  };
+}
+
+/**
+ * Fetch institute settings with Firestore as source of truth and localStorage backup
+ */
+export async function fetchInstituteSettings(): Promise<InstituteSettings> {
+  // Check local cache first for instant response
+  const cached = getStoredList<InstituteSettings | null>(STORAGE_KEYS.INSTITUTE_SETTINGS, null);
+
+  try {
+    const instDoc = doc(db, 'system', 'institute');
+    const snap = await getDoc(instDoc);
+
+    if (snap.exists()) {
+      const settings = normalizeInstituteSettings(snap.data() as Partial<InstituteSettings>);
+      setStoredList(STORAGE_KEYS.INSTITUTE_SETTINGS, settings);
+      return settings;
+    }
+
+    // If Firestore doc does not exist yet, attempt to seed it with defaults
+    const initial = cached ? normalizeInstituteSettings(cached) : { ...DEFAULT_INSTITUTE_SETTINGS };
+    try {
+      await setDoc(instDoc, initial, { merge: true });
+    } catch (e) {
+      console.warn('Initial institute settings seed notice:', e);
+    }
+
+    setStoredList(STORAGE_KEYS.INSTITUTE_SETTINGS, initial);
+    return initial;
+  } catch (err) {
+    console.warn('Firestore institute settings fetch notice:', err);
+    if (cached) {
+      return normalizeInstituteSettings(cached);
+    }
+    return { ...DEFAULT_INSTITUTE_SETTINGS };
+  }
+}
+
+/**
+ * Save updated institute settings to Firestore and local cache
+ */
+export async function saveInstituteSettings(
+  newSettings: Partial<InstituteSettings>
+): Promise<InstituteSettings> {
+  const current = getStoredList<InstituteSettings>(STORAGE_KEYS.INSTITUTE_SETTINGS, DEFAULT_INSTITUTE_SETTINGS);
+  const merged = normalizeInstituteSettings({
+    ...current,
+    ...newSettings,
+    updatedAt: new Date().toISOString(),
+  });
+
+  // Save to local cache immediately
+  setStoredList(STORAGE_KEYS.INSTITUTE_SETTINGS, merged);
+
+  try {
+    const instDoc = doc(db, 'system', 'institute');
+    await setDoc(instDoc, merged, { merge: true });
+  } catch (err) {
+    console.warn('Firestore institute save error, preserved in local storage:', err);
+  }
+
+  return merged;
+}
+
+/**
+ * Real-time listener for institute branding updates across all tabs & devices
+ */
+export function listenToInstituteSettings(
+  onUpdate: (settings: InstituteSettings) => void
+): () => void {
+  try {
+    const instDoc = doc(db, 'system', 'institute');
+    const unsub = onSnapshot(
+      instDoc,
+      (snap) => {
+        if (snap.exists()) {
+          const settings = normalizeInstituteSettings(snap.data() as Partial<InstituteSettings>);
+          setStoredList(STORAGE_KEYS.INSTITUTE_SETTINGS, settings);
+          onUpdate(settings);
+        }
+      },
+      (err) => {
+        console.warn('Institute settings listener notice:', err);
+      }
+    );
+    return unsub;
+  } catch (e) {
+    console.warn('Failed to listen to institute settings:', e);
+    return () => {};
+  }
+}
+
 

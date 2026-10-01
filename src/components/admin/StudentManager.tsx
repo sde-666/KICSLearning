@@ -31,6 +31,7 @@ import {
   forceLogoutStudent,
   normalizeStudentCourseIds,
 } from '../../services/portalService';
+import { useInstitute } from '../../context/InstituteContext';
 
 interface StudentManagerProps {
   students: Student[];
@@ -45,6 +46,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
   onRefresh,
   notify,
 }) => {
+  const { settings } = useInstitute();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCourse, setFilterCourse] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -77,7 +79,8 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
           .map((c) => c.title)
           .join(', ') || 'No courses assigned';
 
-    const text = `KICS Institute Student Login:\nStudent ID / Roll No: ${s.id}\nPassword: ${s.password}\nAllowed Courses: ${assignedCoursesList}\nPortal: https://kicslearning.vercel.app/`;
+    const portalLink = settings.portalUrl || 'https://kicslearning.vercel.app/';
+    const text = `${settings.instituteName} Student Login:\nStudent ID / Roll No: ${s.id}\nPassword: ${s.password}\nAllowed Courses: ${assignedCoursesList}\nPortal: ${portalLink}`;
     navigator.clipboard.writeText(text);
     setCopiedId(s.id);
     notify(`Credentials for "${s.name}" copied to clipboard!`);
@@ -87,7 +90,8 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
   // Open Create Modal
   const handleOpenCreate = () => {
     const nextNumber = students.length + 1;
-    const generatedId = `KICS${new Date().getFullYear().toString().slice(-2)}${String(nextNumber).padStart(3, '0')}`;
+    const prefix = settings.shortName ? settings.shortName.replace(/[^A-Za-z0-9]/g, '').toUpperCase() : 'KICS';
+    const generatedId = `${prefix}${new Date().getFullYear().toString().slice(-2)}${String(nextNumber).padStart(3, '0')}`;
     setEditingStudent({
       id: generatedId,
       name: '',

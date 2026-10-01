@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, GraduationCap, ShieldCheck, User, LogOut } from 'lucide-react';
 import { StudentSession } from '../types';
+import { useInstitute } from '../context/InstituteContext';
 
 interface NavbarProps {
   onHomeClick: () => void;
@@ -17,8 +18,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   studentSession,
   onStudentLogout,
 }) => {
+  const { settings } = useInstitute();
+
   return (
-    <header className="w-full bg-gradient-to-r from-[#5f90eb] via-[#9147f1] to-[#ce03f6] text-white shadow-md select-none">
+    <header className="w-full bg-gradient-to-r from-[#5f90eb] via-[#9147f1] to-[#ce03f6] text-white shadow-md select-none sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
         {/* Logo & Institute Identity */}
         <div
@@ -27,20 +30,23 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group transition-transform active:scale-95 min-w-0"
         >
           <img
-            src="/images/logo.jpg"
-            alt="KICST Logo"
-            className="h-10 sm:h-14 md:h-16 w-auto rounded-lg shadow-sm border border-white/30 object-contain bg-white transition-all shrink-0 group-hover:scale-105"
+            src={settings.logoUrl || '/images/logo.jpg'}
+            alt={`${settings.shortName} Logo`}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/images/logo.jpg';
+            }}
+            className="h-10 sm:h-13 md:h-15 w-auto max-w-[55px] sm:max-w-[70px] rounded-lg shadow-sm border border-white/30 object-contain bg-white transition-all shrink-0 group-hover:scale-105"
           />
           <div className="min-w-0">
             <h1 className="text-xs sm:text-base md:text-xl font-bold tracking-tight text-white leading-tight drop-shadow-sm truncate">
-              Karamraji Institute of Computer Science & IT
+              {settings.instituteName}
             </h1>
             <span
               id="e"
-              className="text-emerald-200 text-[10px] sm:text-xs font-semibold tracking-wide flex items-center gap-1 mt-0.5"
+              className="text-emerald-200 text-[10px] sm:text-xs font-semibold tracking-wide flex items-center gap-1 mt-0.5 truncate"
             >
               <GraduationCap className="w-3.5 h-3.5 text-emerald-300 inline shrink-0" />
-              <span>Karamraji Learning Portal &bull; NIELIT O-Level</span>
+              <span className="truncate">{settings.affiliationText || `${settings.shortName} Learning Portal`}</span>
             </span>
           </div>
         </div>

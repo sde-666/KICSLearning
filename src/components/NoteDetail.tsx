@@ -23,6 +23,7 @@ import {
   X,
   ZoomIn,
 } from 'lucide-react';
+import { useInstitute } from '../context/InstituteContext';
 
 interface NoteDetailProps {
   note: Note;
@@ -49,6 +50,7 @@ export const NoteDetail: React.FC<NoteDetailProps> = ({
   onBackToCourse,
   onBackToHome,
 }) => {
+  const { settings } = useInstitute();
   // Reading preferences stored in localStorage
   const [readingWidth, setReadingWidth] = useState<ReadingWidth>(() => {
     return (localStorage.getItem('kics_reader_width') as ReadingWidth) || 'wide';
@@ -739,7 +741,7 @@ export const NoteDetail: React.FC<NoteDetailProps> = ({
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 gap-2">
               <span className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                Protected Educational Material • Karamraji Institute
+                Protected Educational Material • {settings.instituteName}
               </span>
               <span>Copying & Printing Disabled for Exam Integrity</span>
             </div>

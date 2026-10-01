@@ -1,16 +1,19 @@
 import React from 'react';
 import { Lock } from 'lucide-react';
+import { useInstitute } from '../context/InstituteContext';
 
 interface FooterProps {
   onAdminClick?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
+  const { settings } = useInstitute();
+
   return (
     <footer className="mt-auto py-8 text-center text-xs sm:text-sm text-slate-500 border-t border-slate-200/60 bg-white select-none">
       <div className="max-w-7xl mx-auto px-4 space-y-1.5">
         <p className="font-medium text-slate-700">
-          Karamraji Learning Portal &bull; Karamraji Institute of Computer Science &amp; IT
+          {settings.shortName} Learning Portal &bull; {settings.instituteName}
         </p>
         <p>
           Developed by{' '}
