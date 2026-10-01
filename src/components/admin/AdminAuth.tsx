@@ -1,112 +1,257 @@
-import React from 'react';
-import { BookOpen, GraduationCap, ShieldCheck, User, LogOut } from 'lucide-react';
-import { StudentSession } from '../types';
-import { useInstitute } from '../context/InstituteContext';
+import React, { useState } from 'react';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../firebase';
+import {
+  Shield,
+  Lock,
+  Mail,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+} from 'lucide-react';
+import { useInstitute } from '../../context/InstituteContext';
 
-interface NavbarProps {
-  onHomeClick: () => void;
-  isAdminLoggedIn?: boolean;
-  onOpenAdmin?: () => void;
-  studentSession?: StudentSession | null;
-  onStudentLogout?: () => void;
+interface AdminAuthProps {
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  onHomeClick,
-  isAdminLoggedIn = false,
-  onOpenAdmin,
-  studentSession,
-  onStudentLogout,
-}) => {
+export const AdminAuth: React.FC<AdminAuthProps> = ({ onSuccess, onCancel }) => {
   const { settings } = useInstitute();
+  const [isResetPassword, setIsResetPassword] = useState(false);
+  const [email, setEmail] = useState('mradityapathak53@gmail.com');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Firebase Email/Password Sign-In Handler
+  const handleFirebaseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
+      setErrorMessage('Please enter your administrator email.');
+      return;
+    }
+
+    if (isResetPassword) {
+      setLoading(true);
+      try {
+        await sendPasswordResetEmail(auth, cleanEmail);
+        setSuccessMessage('Password reset link sent to your email address.');
+      } catch (err: any) {
+        setErrorMessage(getFriendlyErrorMessage(err.code || err.message));
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    if (!password) {
+      setErrorMessage('Please enter your password.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, cleanEmail, password);
+      onSuccess();
+    } catch (err: any) {
+      setErrorMessage(getFriendlyErrorMessage(err.code || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFriendlyErrorMessage = (code: string) => {
+    if (code.includes('operation-not-allowed')) {
+      return 'Email/Password sign-in is not enabled in your Firebase Console yet. Please open your Firebase Console (learningportal-32ef9) > Authentication > Sign-in method, click Email/Password, and toggle Enable to ON.';
+    }
+    if (code.includes('user-not-found')) {
+      return 'No administrator account found with this email. Admin accounts are managed directly via Firebase Console > Authentication > Users.';
+    }
+    if (code.includes('wrong-password') || code.includes('invalid-credential')) {
+      return 'Invalid email or password. Please verify your credentials.';
+    }
+    if (code.includes('too-many-requests')) {
+      return 'Access temporarily disabled due to multiple failed login attempts. Please reset your password or try again later.';
+    }
+    if (code.includes('network-request-failed')) {
+      return 'Network connection error. Please check your internet connection.';
+    }
+    return code || 'Authentication failed. Please check your email and password.';
+  };
 
   return (
-    <header className="w-full bg-gradient-to-r from-[#5f90eb] via-[#9147f1] to-[#ce03f6] text-white shadow-md select-none sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
-        {/* Logo & Institute Identity */}
-        <div
-          id="navbar-brand"
-          onClick={onHomeClick}
-          className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group transition-transform active:scale-95 min-w-0"
-        >
-          <img
-            src={settings.logoUrl || '/images/logo.jpg'}
-            alt={`${settings.shortName} Logo`}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/logo.jpg';
-            }}
-            className="h-10 sm:h-13 md:h-15 w-auto max-w-[55px] sm:max-w-[70px] rounded-lg shadow-sm border border-white/30 object-contain bg-white transition-all shrink-0 group-hover:scale-105"
-          />
-          <div className="min-w-0">
-            <h1 className="text-xs sm:text-base md:text-xl font-bold tracking-tight text-white leading-tight drop-shadow-sm truncate">
-              {settings.instituteName}
-            </h1>
-            <span
-              id="e"
-              className="text-emerald-200 text-[10px] sm:text-xs font-semibold tracking-wide flex items-center gap-1 mt-0.5 truncate"
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-emerald-300 inline shrink-0" />
-              <span className="truncate">{settings.affiliationText || `${settings.shortName} Learning Portal`}</span>
-            </span>
+    <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-[#5f90eb] via-[#9147f1] to-[#ce03f6] text-white p-6 text-center relative">
+          <button
+            onClick={onCancel}
+            className="absolute left-4 top-4 text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+            title="Return to Student Portal"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+
+          <div className="w-14 h-14 bg-white/20 backdrop-blur-xs rounded-2xl border border-white/30 flex items-center justify-center mx-auto mb-2.5 shadow-inner p-1">
+            <img
+              src={settings.logoUrl || '/images/logo.jpg'}
+              alt={`${settings.shortName} Logo`}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/logo.jpg';
+              }}
+              className="w-full h-full object-contain rounded-xl bg-white"
+            />
+          </div>
+
+          <h2 className="text-xl font-bold tracking-tight text-white drop-shadow-xs">
+            {settings.shortName} Faculty &amp; Admin
+          </h2>
+          <p className="text-white/85 text-xs mt-1 font-medium px-2">
+            {settings.instituteName}
+          </p>
+
+          <div className="mt-3 text-[11px] text-white font-mono flex items-center justify-center gap-1.5 bg-black/20 py-1 px-3 rounded-full mx-auto w-fit border border-white/20">
+            <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+            <span>Firebase Auth • learningportal-32ef9</span>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap shrink-0">
-          <button
-            id="nav-home-btn"
-            onClick={onHomeClick}
-            className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors border border-white/20 flex items-center gap-1.5 cursor-pointer"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline">My Courses</span>
-          </button>
-
-          {/* Student Profile & Course Access Badge */}
-          {studentSession && (
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="px-2.5 py-1 rounded-full text-xs bg-white/20 backdrop-blur-sm border border-white/30 text-white flex items-center gap-1.5 font-medium max-w-[150px] sm:max-w-none">
-                <User className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
-                <span className="font-semibold truncate">{studentSession.name}</span>
-                <span className="text-[10px] opacity-80 font-mono hidden md:inline">({studentSession.studentId})</span>
-                {studentSession.course_ids && (
-                  <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] sm:text-[10px] bg-emerald-500/30 text-emerald-100 border border-emerald-400/30 font-semibold hidden sm:inline">
-                    {studentSession.course_ids.includes('all') || studentSession.course_id === 'all'
-                      ? 'Full'
-                      : `${studentSession.course_ids.length} Enrolled`}
-                  </span>
-                )}
-              </div>
-
-              {onStudentLogout && (
-                <button
-                  type="button"
-                  onClick={onStudentLogout}
-                  title="Sign out of student portal"
-                  className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs font-semibold bg-red-600/85 hover:bg-red-600 text-white border border-red-400/40 shadow-sm transition-all flex items-center gap-1 cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Log Out</span>
-                </button>
-              )}
+        {/* Content Container */}
+        <div className="p-6 sm:p-8">
+          {/* Alerts */}
+          {errorMessage && (
+            <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{errorMessage}</span>
             </div>
           )}
 
-          {/* Admin Dashboard button if faculty is logged in */}
-          {isAdminLoggedIn && onOpenAdmin && (
-            <button
-              id="admin-active-btn"
-              onClick={onOpenAdmin}
-              title="Return to Admin Panel"
-              className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold bg-emerald-500 hover:bg-emerald-600 text-white border border-emerald-400 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Admin</span>
-            </button>
+          {successMessage && (
+            <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-start gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{successMessage}</span>
+            </div>
           )}
+
+          <form onSubmit={handleFirebaseSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Admin Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="mradityapathak53@gmail.com"
+                  required
+                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1565c0]/30 focus:border-[#1565c0] transition-colors"
+                />
+              </div>
+            </div>
+
+            {!isResetPassword && (
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsResetPassword(true);
+                      setErrorMessage(null);
+                      setSuccessMessage(null);
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="w-full pl-9 pr-10 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1565c0]/30 focus:border-[#1565c0] transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-2 py-2.5 px-4 bg-[#1565c0] hover:bg-[#0d47a1] text-white font-bold text-sm rounded-lg shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Verifying Credentials...</span>
+                </>
+              ) : isResetPassword ? (
+                <span>Send Password Reset Email</span>
+              ) : (
+                <span>Sign In with Firebase Auth</span>
+              )}
+            </button>
+
+            {isResetPassword && (
+              <div className="text-center text-xs text-slate-500 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsResetPassword(false);
+                    setErrorMessage(null);
+                  }}
+                  className="text-blue-600 font-semibold underline cursor-pointer"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            )}
+          </form>
+
+          {/* Console Managed Notice */}
+          <div className="mt-6 pt-4 border-t border-slate-100">
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-xs flex items-center gap-2">
+              <Shield className="w-4 h-4 text-slate-400 shrink-0" />
+              <span>Admin credentials are authenticated via your Firebase project console.</span>
+            </div>
+
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="text-xs text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                Return to Student Portal
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </header>
+    </div>
   );
 };
-
